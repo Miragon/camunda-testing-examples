@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1qbe9q9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.0.0">
+  <bpmn:process id="deliveryprocess" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Delivery required">
+      <bpmn:outgoing>Flow_1le9c94</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1le9c94" sourceRef="StartEvent_1" targetRef="Task_DeliverOrder" />
+    <bpmn:userTask id="Task_DeliverOrder" name="Deliver order">
+      <bpmn:incoming>Flow_1le9c94</bpmn:incoming>
+      <bpmn:incoming>Flow_1xzge20</bpmn:incoming>
+      <bpmn:outgoing>Flow_1c76tja</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_1aol7g1" name="Delivery successful?" default="Flow_0hcxkgt">
+      <bpmn:incoming>Flow_1c76tja</bpmn:incoming>
+      <bpmn:outgoing>Flow_1eyg1vr</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0hcxkgt</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1c76tja" sourceRef="Task_DeliverOrder" targetRef="Gateway_1aol7g1" />
+    <bpmn:endEvent id="EndEvent_DeliveryCompleted" name="Delivery completed">
+      <bpmn:incoming>Flow_1eyg1vr</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1eyg1vr" name="Yes" sourceRef="Gateway_1aol7g1" targetRef="EndEvent_DeliveryCompleted">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${orderDelivered}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0hcxkgt" name="No" sourceRef="Gateway_1aol7g1" targetRef="Event_nextDay" />
+    <bpmn:intermediateCatchEvent id="Event_nextDay" name="next day">
+      <bpmn:incoming>Flow_0hcxkgt</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xzge20</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1ogvgtl">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P1D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1xzge20" sourceRef="Event_nextDay" targetRef="Task_DeliverOrder" />
+    <bpmn:boundaryEvent id="Event_0hiq3tu" attachedToRef="Task_DeliverOrder">
+      <bpmn:outgoing>Flow_0z9qo9z</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1ipfn6n" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0z9qo9z" sourceRef="Event_0hiq3tu" targetRef="EndEvent_DeliveryCancelled" />
+    <bpmn:endEvent id="EndEvent_DeliveryCancelled" name="Delivery failed">
+      <bpmn:incoming>Flow_0z9qo9z</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1h1cn6k" errorRef="Error_0q7azt4" />
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:error id="Error_0q7azt4" name="Error_DeliveryFailed" errorCode="Error_DeliveryFailed" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="deliveryprocess">
+      <bpmndi:BPMNEdge id="Flow_0z9qo9z_di" bpmnElement="Flow_0z9qo9z">
+        <di:waypoint x="350" y="275" />
+        <di:waypoint x="350" y="320" />
+        <di:waypoint x="432" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xzge20_di" bpmnElement="Flow_1xzge20">
+        <di:waypoint x="362" y="120" />
+        <di:waypoint x="320" y="120" />
+        <di:waypoint x="320" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hcxkgt_di" bpmnElement="Flow_0hcxkgt">
+        <di:waypoint x="450" y="192" />
+        <di:waypoint x="450" y="120" />
+        <di:waypoint x="398" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="458" y="153" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1eyg1vr_di" bpmnElement="Flow_1eyg1vr">
+        <di:waypoint x="475" y="217" />
+        <di:waypoint x="552" y="217" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="505" y="199" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1c76tja_di" bpmnElement="Flow_1c76tja">
+        <di:waypoint x="370" y="217" />
+        <di:waypoint x="425" y="217" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1le9c94_di" bpmnElement="Flow_1le9c94">
+        <di:waypoint x="215" y="217" />
+        <di:waypoint x="270" y="217" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="199" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="155" y="242" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0c0sy4h_di" bpmnElement="Task_DeliverOrder">
+        <dc:Bounds x="270" y="177" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1aol7g1_di" bpmnElement="Gateway_1aol7g1" isMarkerVisible="true">
+        <dc:Bounds x="425" y="192" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="421" y="249" width="58" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1lij7jl_di" bpmnElement="EndEvent_DeliveryCompleted">
+        <dc:Bounds x="552" y="199" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="545" y="242" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0i1rd26_di" bpmnElement="Event_nextDay">
+        <dc:Bounds x="362" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="359" y="83" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1crq3tv_di" bpmnElement="EndEvent_DeliveryCancelled">
+        <dc:Bounds x="432" y="302" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="415" y="345" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0y61cee_di" bpmnElement="Event_0hiq3tu">
+        <dc:Bounds x="332" y="239" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
