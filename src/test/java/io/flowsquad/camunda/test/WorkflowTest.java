@@ -2,19 +2,22 @@ package io.flowsquad.camunda.test;
 
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.extension.mockito.ProcessExpressions;
+import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageProcessEngineRule;
+import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageProcessEngineRuleBuilder;
 import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
 import org.camunda.bpm.scenario.delegate.TaskDelegate;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.mockito.Mockito.*;
 
 @Deployment(resources = "order-process.bpmn")
@@ -36,7 +39,11 @@ public class WorkflowTest {
     public static final String VAR_CUSTOMER = "customer";
 
     @Rule
-    public ProcessEngineRule rule = new ProcessEngineRule();
+    @ClassRule
+    public static TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create()
+            .excludeProcessDefinitionKeys(DELIVERY_PROCESS_KEY)
+            .assertClassCoverageAtLeast(0.9)
+            .build();
 
     @Mock
     private ProcessScenario testOrderProcess;
@@ -77,6 +84,8 @@ public class WorkflowTest {
         //Further Activities
         when(testOrderProcess.waitsAtUserTask(TASK_CANCEL_ORDER))
                 .thenReturn(TaskDelegate::complete);
+
+
     }
 
     @Test
@@ -87,6 +96,8 @@ public class WorkflowTest {
 
         verify(testOrderProcess)
                 .hasFinished(END_EVENT_ORDER_FULLFILLED);
+
+        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteHappyPath", greaterThanOrEqualTo(0.5));
     }
 
     @Test
