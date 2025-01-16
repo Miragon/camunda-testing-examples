@@ -25,10 +25,11 @@ public class WorkflowTest {
 
     public static final String PROCESS_KEY = "orderprocess";
     public static final String DELIVERY_PROCESS_KEY = "deliveryprocess";
+
     public static final String TASK_CHECK_AVAILABILITY = "Task_CheckAvailability";
     public static final String VAR_PRODUCTS_AVAILABLE = "productsAvailable";
     public static final String TASK_PREPARE_ORDER = "Task_PrepareOrder";
-    public static final String TASK_DELIVER_ORDER = "Task_DeliverOrder";
+    public static final String TASK_DELIVER_ORDER = "Task_DeliverOrder1";
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
     public static final String TASK_CANCEL_ORDER = "Task_CancelOrder";
     public static final String TASK_SEND_CANCELLATION = "Task_SendCancellation";
