@@ -6,7 +6,7 @@ import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageP
 import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
 import org.junit.Before;
-import org.junit.ClassRule;
+//import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -26,8 +26,7 @@ public class DeliveryProcessTest {
     public static final String END_EVENT_DELIVERY_CANCELLED = "EndEvent_DeliveryCancelled";
 
     @Rule
-    @ClassRule
-    public static TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create()
+    public TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create()
             .assertClassCoverageAtLeast(0.9)
             .build();
 
@@ -40,9 +39,7 @@ public class DeliveryProcessTest {
 
         //Happy-Path
         when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER))
-                .thenReturn(task -> {
-                    task.complete(withVariables(VAR_ORDER_DELIVERED, true));
-                });
+                .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
     }
 
     @Test
@@ -57,9 +54,7 @@ public class DeliveryProcessTest {
 
     @Test
     public void shouldExecuteOrderCancelled() {
-        when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER)).thenReturn(task -> {
-            taskService().handleBpmnError(task.getId(), "DeliveryCancelled");
-        });
+        when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER)).thenReturn(task -> taskService().handleBpmnError(task.getId(), "DeliveryCancelled"));
 
         Scenario.run(testDeliveryProcess)
                 .startByKey(PROCESS_KEY)
@@ -71,11 +66,7 @@ public class DeliveryProcessTest {
 
     @Test
     public void shouldExecuteDeliverTwice() {
-        when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER)).thenReturn(task -> {
-            task.complete(withVariables(VAR_ORDER_DELIVERED, false));
-        }, task -> {
-            task.complete(withVariables(VAR_ORDER_DELIVERED, true));
-        });
+        when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER)).thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, false)), task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
 
         Scenario.run(testDeliveryProcess)
                 .startByKey(PROCESS_KEY)

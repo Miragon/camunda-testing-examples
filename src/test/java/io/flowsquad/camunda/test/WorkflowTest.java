@@ -68,17 +68,13 @@ public class WorkflowTest {
 
         //Happy-Path
         when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY))
-                .thenReturn(task -> {
-                    task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, true));
-                });
+                .thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, true)));
 
         when(testOrderProcess.waitsAtUserTask(TASK_PREPARE_ORDER))
                 .thenReturn(TaskDelegate::complete);
 
         when(testOrderProcess.waitsAtUserTask(TASK_DELIVER_ORDER))
-                .thenReturn(task -> {
-                    task.complete(withVariables(VAR_ORDER_DELIVERED, true));
-                });
+                .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
 
         //Further Activities
         when(testOrderProcess.waitsAtUserTask(TASK_CANCEL_ORDER))
@@ -101,9 +97,7 @@ public class WorkflowTest {
 
     @Test
     public void shouldExecuteCancellationSent() {
-        when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY)).thenReturn(task -> {
-            task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false));
-        });
+        when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
 
         Scenario.run(testOrderProcess)
                 .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
