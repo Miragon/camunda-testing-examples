@@ -10,7 +10,6 @@ import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
 import org.camunda.bpm.scenario.delegate.TaskDelegate;
 import org.junit.Before;
-//import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -21,10 +20,10 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.mockito.Mockito.*;
 
 @Deployment(resources = "order-process.bpmn")
-public class WorkflowTest {
+public class OrderProcessTest {
 
     public static final String PROCESS_KEY = "orderprocess";
-    public static final String DELIVERY_PROCESS_KEY = "deliveryprocess";
+    public static final String DELIVERY_PROCESS_KEY = "deliverprocess";
     public static final String TASK_CHECK_AVAILABILITY = "Task_CheckAvailability";
     public static final String VAR_PRODUCTS_AVAILABLE = "productsAvailable";
     public static final String TASK_PREPARE_ORDER = "Task_PrepareOrder";
@@ -39,7 +38,8 @@ public class WorkflowTest {
     public static final String VAR_CUSTOMER = "customer";
 
     @Rule
-    public TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create()
+    public TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder
+            .create()
             .excludeProcessDefinitionKeys(DELIVERY_PROCESS_KEY)
             .assertClassCoverageAtLeast(0.9)
             .build();
@@ -48,7 +48,7 @@ public class WorkflowTest {
     private ProcessScenario testOrderProcess;
 
     @Mock
-    private ProcessScenario deliveryRequest;
+    private ProcessScenario deliverRequest;
 
     @Mock
     private MailingService mailingService;
@@ -64,7 +64,7 @@ public class WorkflowTest {
                 .deploy(rule);
 
         when(testOrderProcess.runsCallActivity(TASK_DELIVER_ORDER1))
-                .thenReturn(Scenario.use(deliveryRequest));
+                .thenReturn(Scenario.use(deliverRequest));
 
         //Happy-Path
         when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY))

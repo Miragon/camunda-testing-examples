@@ -48,7 +48,7 @@
       <bpmn:compensateEventDefinition id="CompensateEventDefinition_1h54rum" />
     </bpmn:boundaryEvent>
     <bpmn:userTask id="Task_CancelOrder" name="Cancel order" isForCompensation="true" />
-    <bpmn:callActivity id="Task_DeliverOrder" name="Deliver order" calledElement="deliveryprocess">
+    <bpmn:callActivity id="Task_DeliverOrder" name="Deliver order" calledElement="deliverprocess">
       <bpmn:extensionElements>
         <camunda:in variables="all" />
         <camunda:in businessKey="#{execution.processBusinessKey}" />
