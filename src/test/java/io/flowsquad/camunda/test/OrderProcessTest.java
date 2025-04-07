@@ -30,25 +30,24 @@ public class OrderProcessTest {
     public static final String TASK_DELIVER_ORDER = "Task_DeliverOrder";
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
     public static final String TASK_CANCEL_ORDER = "Task_CancelOrder";
-    //public static final String TASK_SEND_CANCELLATION = "Task_SendCancellation";
     public static final String END_EVENT_ORDER_FULLFILLED = "EndEvent_OrderFullfilled";
     public static final String END_EVENT_ORDER_CANCELLED = "EndEvent_OrderCancelled";
     public static final String END_EVENT_CANCELLATION_SENT = "EndEvent_CancellationSent";
-    public static final String TASK_DELIVER_ORDER1 = "Task_DeliverOrder";
+    //public static final String TASK_DELIVER_ORDER1 = "Task_DeliverOrder";
     public static final String VAR_CUSTOMER = "customer";
 
     @Rule
     public TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder
             .create()
-            .excludeProcessDefinitionKeys(DELIVERY_PROCESS_KEY)
+            .excludeProcessDefinitionKeys(DELIVERY_PROCESS_KEY) //Exclude partial process scenario
             .assertClassCoverageAtLeast(0.9)
             .build();
 
     @Mock
     private ProcessScenario testOrderProcess;
 
-    @Mock
-    private ProcessScenario deliverRequest;
+    //@Mock
+    //private ProcessScenario deliverRequest;
 
     @Mock
     private MailingService mailingService;
@@ -56,15 +55,6 @@ public class OrderProcessTest {
     @Before
     public void defaultScenario() {
         MockitoAnnotations.initMocks(this);
-        Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailingService));
-
-        doNothing().when(mailingService).sendMail(any());
-
-        ProcessExpressions.registerCallActivityMock(DELIVERY_PROCESS_KEY)
-                .deploy(rule);
-
-        when(testOrderProcess.runsCallActivity(TASK_DELIVER_ORDER1))
-                .thenReturn(Scenario.use(deliverRequest));
 
         //Happy-Path
         when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY))
@@ -79,35 +69,6 @@ public class OrderProcessTest {
         //Further Activities
         when(testOrderProcess.waitsAtUserTask(TASK_CANCEL_ORDER))
                 .thenReturn(TaskDelegate::complete);
-
-
-    }
-
-    @Test
-    public void shouldExecuteHappyPath() {
-        Scenario.run(testOrderProcess)
-                .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
-                .execute();
-
-        verify(testOrderProcess)
-                .hasFinished(END_EVENT_ORDER_FULLFILLED);
-
-        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteHappyPath", greaterThanOrEqualTo(0.5));
-    }
-
-    @Test
-    public void shouldExecuteCancellationSent() {
-        when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
-
-        Scenario.run(testOrderProcess)
-                .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
-                .execute();
-
-        verify(testOrderProcess)
-                .hasFinished(END_EVENT_CANCELLATION_SENT);
-
-        verify(mailingService, (times(1))).sendMail(any());
-        verifyNoMoreInteractions(mailingService);
     }
 
     @Test
@@ -123,8 +84,47 @@ public class OrderProcessTest {
                 .execute();
 
         verify(testOrderProcess)
-                .hasCompleted(TASK_CANCEL_ORDER);
+                .hasCompleted(TASK_CANCEL_ORDER); // verify the further default activity here
         verify(testOrderProcess)
                 .hasFinished(END_EVENT_ORDER_CANCELLED);
+    }
+
+    @Test
+    public void shouldExecuteCancellationSent() {
+        //Register implementation of SendCancellationDelegate (and private member mailingService, see Mocks)
+        Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailingService));
+        //What for?
+        //doNothing().when(mailingService).sendMail(any());
+
+        when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
+
+        Scenario.run(testOrderProcess)
+                .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
+                .execute();
+
+        verify(mailingService, (times(1))).sendMail(any());
+        verifyNoMoreInteractions(mailingService);
+        verify(testOrderProcess)
+                .hasFinished(END_EVENT_CANCELLATION_SENT);
+    }
+
+    @Test
+    public void shouldExecuteHappyPath() {
+        //Include partial process scenario
+        ProcessExpressions.registerCallActivityMock(DELIVERY_PROCESS_KEY)
+                .deploy(rule);
+
+        //Use partial process scenario
+        //when(testOrderProcess.runsCallActivity(TASK_DELIVER_ORDER1))
+        //        .thenReturn(Scenario.use(deliverRequest));
+
+        Scenario.run(testOrderProcess)
+                .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
+                .execute();
+
+        verify(testOrderProcess)
+                .hasFinished(END_EVENT_ORDER_FULLFILLED);
+
+        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteHappyPath", greaterThanOrEqualTo(0.5));
     }
 }
