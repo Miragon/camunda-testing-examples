@@ -10,7 +10,7 @@ import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
 import org.camunda.bpm.scenario.delegate.TaskDelegate;
 import org.junit.Before;
-import org.junit.ClassRule;
+//import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -31,7 +31,7 @@ public class WorkflowTest {
     public static final String TASK_DELIVER_ORDER = "Task_DeliverOrder";
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
     public static final String TASK_CANCEL_ORDER = "Task_CancelOrder";
-    public static final String TASK_SEND_CANCELLATION = "Task_SendCancellation";
+    //public static final String TASK_SEND_CANCELLATION = "Task_SendCancellation";
     public static final String END_EVENT_ORDER_FULLFILLED = "EndEvent_OrderFullfilled";
     public static final String END_EVENT_ORDER_CANCELLED = "EndEvent_OrderCancelled";
     public static final String END_EVENT_CANCELLATION_SENT = "EndEvent_CancellationSent";
@@ -39,8 +39,7 @@ public class WorkflowTest {
     public static final String VAR_CUSTOMER = "customer";
 
     @Rule
-    @ClassRule
-    public static TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create()
+    public TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create()
             .excludeProcessDefinitionKeys(DELIVERY_PROCESS_KEY)
             .assertClassCoverageAtLeast(0.9)
             .build();
