@@ -16,10 +16,10 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVar
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.mockito.Mockito.*;
 
-@Deployment(resources = "deliver-process.bpmn")
-public class DeliverProcessTest {
+@Deployment(resources = "delivery-process.bpmn")
+public class DeliveryProcessTest {
 
-    public static final String PROCESS_KEY = "deliverprocess";
+    public static final String PROCESS_KEY = "deliveryprocess";
     public static final String TASK_DELIVER_ORDER = "Task_DeliverOrder";
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
     public static final String END_EVENT_DELIVERY_COMPLETED = "EndEvent_DeliveryCompleted";
@@ -32,24 +32,24 @@ public class DeliverProcessTest {
             .build();
 
     @Mock
-    private ProcessScenario testDeliverProcess;
+    private ProcessScenario testDeliveryProcess;
 
     @Before
     public void defaultScenario() {
         MockitoAnnotations.initMocks(this);
 
         //Happy-Path
-        when(testDeliverProcess.waitsAtUserTask(TASK_DELIVER_ORDER))
+        when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER))
                 .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
     }
 
     @Test
     public void shouldExecuteHappyPath() {
-        Scenario.run(testDeliverProcess)
+        Scenario.run(testDeliveryProcess)
                 .startByKey(PROCESS_KEY)
                 .execute();
 
-        verify(testDeliverProcess)
+        verify(testDeliveryProcess)
                 .hasFinished(END_EVENT_DELIVERY_COMPLETED);
 
         rule.addTestMethodCoverageAssertionMatcher("shouldExecuteHappyPath", greaterThanOrEqualTo(0.5));
@@ -57,27 +57,27 @@ public class DeliverProcessTest {
 
     @Test
     public void shouldExecuteOrderCancelled() {
-        when(testDeliverProcess.waitsAtUserTask(TASK_DELIVER_ORDER)).thenReturn(task -> taskService().handleBpmnError(task.getId(), "DeliveryCancelled"));
+        when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER)).thenReturn(task -> taskService().handleBpmnError(task.getId(), "DeliveryCancelled"));
 
-        Scenario.run(testDeliverProcess)
+        Scenario.run(testDeliveryProcess)
                 .startByKey(PROCESS_KEY)
                 .execute();
 
-        verify(testDeliverProcess)
+        verify(testDeliveryProcess)
                 .hasFinished(END_EVENT_DELIVERY_CANCELLED);
     }
 
     @Test
     public void shouldExecuteDeliverTwice() {
-        when(testDeliverProcess.waitsAtUserTask(TASK_DELIVER_ORDER)).thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, false)), task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
+        when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER)).thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, false)), task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
 
-        Scenario.run(testDeliverProcess)
+        Scenario.run(testDeliveryProcess)
                 .startByKey(PROCESS_KEY)
                 .execute();
 
-        verify(testDeliverProcess, times(2))
+        verify(testDeliveryProcess, times(2))
                 .hasCompleted(TASK_DELIVER_ORDER);
-        verify(testDeliverProcess)
+        verify(testDeliveryProcess)
                 .hasFinished(END_EVENT_DELIVERY_COMPLETED);
     }
 }

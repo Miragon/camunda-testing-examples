@@ -12,7 +12,7 @@
     </parent>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>21</java.version>
     </properties>
 
     <groupId>io.flowsquad.camunda.test</groupId>
@@ -23,19 +23,19 @@
         <dependency>
             <groupId>org.camunda.bpm.springboot</groupId>
             <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
-            <version>7.14.0</version>
+            <version>7.23.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.camunda.bpm.springboot</groupId>
             <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
-            <version>7.14.0</version>
+            <version>7.23.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.camunda.bpm.springboot</groupId>
             <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
-            <version>7.14.0</version>
+            <version>7.23.0</version>
         </dependency>
 
         <dependency>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.camunda.bpm.extension</groupId>
             <artifactId>camunda-bpm-process-test-coverage</artifactId>
-            <version>0.3.2</version>
+            <version>0.4.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -76,6 +76,26 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>io.github.emaarco</groupId>
+                <artifactId>bpmn-to-code-maven</artifactId>
+                <version>0.0.4-alpha</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-bpmn-api</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <baseDir>${project.basedir}</baseDir>
+                    <filePattern>src/main/resources/*.bpmn</filePattern>
+                    <outputFolderPath>${project.basedir}/src/main/java</outputFolderPath>
+                    <packagePath>io.flowsquad.camunda.test</packagePath>
+                    <outputLanguage>JAVA</outputLanguage>
+                    <processEngine>ZEEBE</processEngine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

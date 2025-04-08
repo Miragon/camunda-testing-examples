@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1qbe9q9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.0.0">
-  <bpmn:process id="deliverprocess" isExecutable="true">
+  <bpmn:process id="deliveryprocess" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1" name="Delivery required">
       <bpmn:outgoing>Flow_1le9c94</bpmn:outgoing>
     </bpmn:startEvent>
@@ -43,7 +43,7 @@
   </bpmn:process>
   <bpmn:error id="Error_0q7azt4" name="Error_DeliveryFailed" errorCode="Error_DeliveryFailed" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="deliverprocess">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="deliveryprocess">
       <bpmndi:BPMNEdge id="Flow_0z9qo9z_di" bpmnElement="Flow_0z9qo9z">
         <di:waypoint x="350" y="275" />
         <di:waypoint x="350" y="320" />
