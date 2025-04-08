@@ -33,7 +33,6 @@ public class OrderProcessTest {
     public static final String END_EVENT_ORDER_FULLFILLED = "EndEvent_OrderFullfilled";
     public static final String END_EVENT_ORDER_CANCELLED = "EndEvent_OrderCancelled";
     public static final String END_EVENT_CANCELLATION_SENT = "EndEvent_CancellationSent";
-    //public static final String TASK_DELIVER_ORDER1 = "Task_DeliverOrder";
     public static final String VAR_CUSTOMER = "customer";
 
     @Rule
@@ -45,9 +44,6 @@ public class OrderProcessTest {
 
     @Mock
     private ProcessScenario testOrderProcess;
-
-    //@Mock
-    //private ProcessScenario deliverRequest;
 
     @Mock
     private MailingService mailingService;
@@ -73,6 +69,7 @@ public class OrderProcessTest {
 
     @Test
     public void shouldExecuteOrderCancelled() {
+        //Include partial process scenario
         ProcessExpressions.registerCallActivityMock(DELIVERY_PROCESS_KEY)
                 .onExecutionDo(execution -> {
                     throw new BpmnError("deliveryFailed");
@@ -93,8 +90,6 @@ public class OrderProcessTest {
     public void shouldExecuteCancellationSent() {
         //Register implementation of SendCancellationDelegate (and private member mailingService, see Mocks)
         Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailingService));
-        //What for?
-        //doNothing().when(mailingService).sendMail(any());
 
         when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
 
@@ -113,10 +108,6 @@ public class OrderProcessTest {
         //Include partial process scenario
         ProcessExpressions.registerCallActivityMock(DELIVERY_PROCESS_KEY)
                 .deploy(rule);
-
-        //Use partial process scenario
-        //when(testOrderProcess.runsCallActivity(TASK_DELIVER_ORDER1))
-        //        .thenReturn(Scenario.use(deliverRequest));
 
         Scenario.run(testOrderProcess)
                 .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
