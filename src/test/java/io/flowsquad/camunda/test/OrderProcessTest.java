@@ -82,6 +82,7 @@ public class OrderProcessTest {
 
         verify(testOrderProcess)
                 .hasFinished(END_EVENT_ORDER_CANCELLED);
+        //Jumps back to corresponding boundary event and verifies the task there has completed
         verify(testOrderProcess)
                 .hasCompleted(TASK_CANCEL_ORDER);
     }
