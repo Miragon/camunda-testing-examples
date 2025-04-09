@@ -81,9 +81,9 @@ public class OrderProcessTest {
                 .execute();
 
         verify(testOrderProcess)
-                .hasCompleted(TASK_CANCEL_ORDER); // verify the further default activity here
-        verify(testOrderProcess)
                 .hasFinished(END_EVENT_ORDER_CANCELLED);
+        verify(testOrderProcess)
+                .hasCompleted(TASK_CANCEL_ORDER);
     }
 
     @Test
