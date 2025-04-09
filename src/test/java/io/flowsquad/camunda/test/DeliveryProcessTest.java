@@ -44,18 +44,6 @@ public class DeliveryProcessTest {
     }
 
     @Test
-    public void shouldExecuteHappyPath() {
-        Scenario.run(testDeliveryProcess)
-                .startByKey(PROCESS_KEY)
-                .execute();
-
-        verify(testDeliveryProcess)
-                .hasFinished(END_EVENT_DELIVERY_COMPLETED);
-
-        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteHappyPath", greaterThanOrEqualTo(0.5));
-    }
-
-    @Test
     public void shouldExecuteOrderCancelled() {
         when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER)).thenReturn(task -> taskService().handleBpmnError(task.getId(), "DeliveryCancelled"));
 
@@ -79,5 +67,17 @@ public class DeliveryProcessTest {
                 .hasCompleted(TASK_DELIVER_ORDER);
         verify(testDeliveryProcess)
                 .hasFinished(END_EVENT_DELIVERY_COMPLETED);
+    }
+
+    @Test
+    public void shouldExecuteHappyPath() {
+        Scenario.run(testDeliveryProcess)
+                .startByKey(PROCESS_KEY)
+                .execute();
+
+        verify(testDeliveryProcess)
+                .hasFinished(END_EVENT_DELIVERY_COMPLETED);
+
+        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteHappyPath", greaterThanOrEqualTo(0.5));
     }
 }

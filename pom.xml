@@ -94,7 +94,7 @@
                     <outputFolderPath>${project.basedir}/src/main/java</outputFolderPath>
                     <packagePath>io.flowsquad.camunda.test</packagePath>
                     <outputLanguage>JAVA</outputLanguage>
-                    <processEngine>DEFAULT</processEngine>
+                    <processEngine>CAMUNDA_7</processEngine>
                 </configuration>
             </plugin>
         </plugins>
