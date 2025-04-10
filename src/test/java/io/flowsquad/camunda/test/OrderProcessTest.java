@@ -85,7 +85,7 @@ public class OrderProcessTest {
 
         verify(testOrderProcess)
                 .hasFinished(END_EVENT_ORDER_CANCELLED);
-        //Jumps back to corresponding boundary event and verifies the task there has completed
+        //Jumps back to the corresponding boundary event and verifies the task there has completed
         verify(testOrderProcess)
                 .hasCompleted(TASK_CANCEL_ORDER);
 
@@ -94,7 +94,7 @@ public class OrderProcessTest {
 
     @Test
     public void shouldExecuteCancellationSent() {
-        //Register implementation of SendCancellationDelegate (and private member mailingService, see Mocks)
+        //Register implementation of SendCancellationDelegate (with private member mailingService), see Mocks
         Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailingService));
 
         when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
