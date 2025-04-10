@@ -10,6 +10,7 @@ import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
 import org.camunda.bpm.scenario.delegate.TaskDelegate;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,8 +36,10 @@ public class OrderProcessTest {
     public static final String END_EVENT_CANCELLATION_SENT = "EndEvent_CancellationSent";
     public static final String VAR_CUSTOMER = "customer";
 
+    @SuppressWarnings("JUnitMalformedDeclaration")
     @Rule
-    public TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder
+    @ClassRule
+    public static TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder
             .create()
             .excludeProcessDefinitionKeys(DELIVERY_PROCESS_KEY) //Exclude partial process scenario
             .assertClassCoverageAtLeast(0.9)
@@ -85,6 +88,8 @@ public class OrderProcessTest {
         //Jumps back to corresponding boundary event and verifies the task there has completed
         verify(testOrderProcess)
                 .hasCompleted(TASK_CANCEL_ORDER);
+
+        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteOrderCancelled", greaterThanOrEqualTo(0.6));
     }
 
     @Test
@@ -102,6 +107,8 @@ public class OrderProcessTest {
         verifyNoMoreInteractions(mailingService);
         verify(testOrderProcess)
                 .hasFinished(END_EVENT_CANCELLATION_SENT);
+
+        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteCancellationSent", greaterThanOrEqualTo(0.4));
     }
 
     @Test

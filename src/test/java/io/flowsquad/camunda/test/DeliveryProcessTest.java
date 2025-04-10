@@ -6,6 +6,7 @@ import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageP
 import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -25,8 +26,10 @@ public class DeliveryProcessTest {
     public static final String END_EVENT_DELIVERY_COMPLETED = "EndEvent_DeliveryCompleted";
     public static final String END_EVENT_DELIVERY_CANCELLED = "EndEvent_DeliveryCancelled";
 
+    @SuppressWarnings("JUnitMalformedDeclaration")
     @Rule
-    public TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder
+    @ClassRule
+    public static TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder
             .create()
             .assertClassCoverageAtLeast(0.9)
             .build();
@@ -53,6 +56,8 @@ public class DeliveryProcessTest {
 
         verify(testDeliveryProcess)
                 .hasFinished(END_EVENT_DELIVERY_CANCELLED);
+
+        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteOrderCancelled", greaterThanOrEqualTo(0.4));
     }
 
     @Test
@@ -67,6 +72,8 @@ public class DeliveryProcessTest {
                 .hasCompleted(TASK_DELIVER_ORDER);
         verify(testDeliveryProcess)
                 .hasFinished(END_EVENT_DELIVERY_COMPLETED);
+
+        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteDeliverTwice", greaterThanOrEqualTo(0.7));
     }
 
     @Test
