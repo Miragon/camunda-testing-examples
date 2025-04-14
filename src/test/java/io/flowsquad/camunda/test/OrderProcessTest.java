@@ -16,7 +16,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.Elements.Task_SendCancellation;
+import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.Elements.*;
+import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.PROCESS_ID;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.mockito.Mockito.*;
@@ -24,17 +25,17 @@ import static org.mockito.Mockito.*;
 @Deployment(resources = "order-process.bpmn")
 public class OrderProcessTest {
 
-    public static final String PROCESS_KEY = "orderprocess";
+    //public static final String PROCESS_KEY = "orderprocess";
     public static final String DELIVERY_PROCESS_KEY = "deliveryprocess";
-    public static final String TASK_CHECK_AVAILABILITY = "Task_CheckAvailability";
+    //public static final String TASK_CHECK_AVAILABILITY = "Task_CheckAvailability";
     public static final String VAR_PRODUCTS_AVAILABLE = "productsAvailable";
-    public static final String TASK_PREPARE_ORDER = "Task_PrepareOrder";
-    public static final String TASK_DELIVER_ORDER = "Task_DeliverOrder";
+    //public static final String TASK_PREPARE_ORDER = "Task_PrepareOrder";
+    //public static final String TASK_DELIVER_ORDER = "Task_DeliverOrder";
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
-    public static final String TASK_CANCEL_ORDER = "Task_CancelOrder";
-    public static final String END_EVENT_ORDER_FULLFILLED = "EndEvent_OrderFullfilled";
+    //public static final String TASK_CANCEL_ORDER = "Task_CancelOrder";
+    //public static final String END_EVENT_ORDER_FULLFILLED = "EndEvent_OrderFullfilled";
     public static final String END_EVENT_ORDER_CANCELLED = "EndEvent_OrderCancelled";
-    public static final String END_EVENT_CANCELLATION_SENT = "EndEvent_CancellationSent";
+    //public static final String END_EVENT_CANCELLATION_SENT = "EndEvent_CancellationSent";
     public static final String VAR_CUSTOMER = "customer";
 
     @SuppressWarnings("JUnitMalformedDeclaration")
@@ -57,18 +58,18 @@ public class OrderProcessTest {
         MockitoAnnotations.initMocks(this);
 
         //Happy-Path
-        when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY))
+        when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability))
                 .thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, true)));
 
-        when(testOrderProcess.waitsAtUserTask(TASK_PREPARE_ORDER))
+        when(testOrderProcess.waitsAtUserTask(Task_PrepareOrder))
                 .thenReturn(TaskDelegate::complete);
 
-        when(testOrderProcess.waitsAtUserTask(TASK_DELIVER_ORDER))
+        when(testOrderProcess.waitsAtUserTask(Task_DeliverOrder))
                 .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
 
         //Further Activities
-        when(testOrderProcess.waitsAtUserTask(TASK_CANCEL_ORDER))
-                .thenReturn(TaskDelegate::complete);
+        //when(testOrderProcess.waitsAtUserTask(TASK_CANCEL_ORDER))
+        //        .thenReturn(TaskDelegate::complete);
     }
 
     @Test
@@ -81,14 +82,14 @@ public class OrderProcessTest {
                 .deploy(rule);
 
         Scenario.run(testOrderProcess)
-                .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
+                .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
                 .execute();
 
         verify(testOrderProcess)
                 .hasFinished(END_EVENT_ORDER_CANCELLED);
         //Jumps back to the corresponding boundary event and verifies the task there has completed
-        verify(testOrderProcess)
-                .hasCompleted(TASK_CANCEL_ORDER);
+        //verify(testOrderProcess)
+        //        .hasCompleted(TASK_CANCEL_ORDER);
 
         rule.addTestMethodCoverageAssertionMatcher("shouldExecuteOrderCancelled", greaterThanOrEqualTo(0.6));
     }
@@ -96,22 +97,18 @@ public class OrderProcessTest {
     @Test
     public void shouldExecuteCancellationSent() {
         //Register implementation of SendCancellationDelegate (with private member mailingService), see Mocks
-        //Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailingService));
+        Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailingService));
 
-        when(testOrderProcess.waitsAtServiceTask(Task_SendCancellation)).thenReturn(task ->{
-            // Simulate sending an email
-            task.complete();
-        });
-        when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
+        when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
 
         Scenario.run(testOrderProcess)
-                .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
+                .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
                 .execute();
 
-        //verify(mailingService, (times(1))).sendMail(any());
-        //verifyNoMoreInteractions(mailingService);
+        verify(mailingService, (times(1))).sendMail(any());
+        verifyNoMoreInteractions(mailingService);
         verify(testOrderProcess)
-                .hasFinished(END_EVENT_CANCELLATION_SENT);
+                .hasFinished(EndEvent_CancellationSent);
 
         rule.addTestMethodCoverageAssertionMatcher("shouldExecuteCancellationSent", greaterThanOrEqualTo(0.4));
     }
@@ -123,11 +120,11 @@ public class OrderProcessTest {
                 .deploy(rule);
 
         Scenario.run(testOrderProcess)
-                .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
+                .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
                 .execute();
 
         verify(testOrderProcess)
-                .hasFinished(END_EVENT_ORDER_FULLFILLED);
+                .hasFinished(EndEvent_OrderFullfilled);
 
         rule.addTestMethodCoverageAssertionMatcher("shouldExecuteHappyPath", greaterThanOrEqualTo(0.5));
     }

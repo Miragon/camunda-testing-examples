@@ -23,7 +23,7 @@
       <bpmn:incoming>Flow_05rygam</bpmn:incoming>
       <bpmn:outgoing>Flow_1xiisft</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:serviceTask id="Task_SendCancellation" name="Send cancellation" camunda:type="external" camunda:topic="send-cancellation">
+    <bpmn:serviceTask id="Task_SendCancellation" name="Send cancellation">
       <bpmn:incoming>Flow_0lghxms</bpmn:incoming>
       <bpmn:outgoing>Flow_0plm3v0</bpmn:outgoing>
     </bpmn:serviceTask>
