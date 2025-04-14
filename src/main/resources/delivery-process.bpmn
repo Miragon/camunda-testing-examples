@@ -31,15 +31,6 @@
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="Flow_1xzge20" sourceRef="Event_nextDay" targetRef="Task_DeliverOrder" />
-    <bpmn:boundaryEvent id="Event_0hiq3tu" attachedToRef="Task_DeliverOrder">
-      <bpmn:outgoing>Flow_0z9qo9z</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_1ipfn6n" />
-    </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="Flow_0z9qo9z" sourceRef="Event_0hiq3tu" targetRef="EndEvent_DeliveryCancelled" />
-    <bpmn:endEvent id="EndEvent_DeliveryCancelled" name="Delivery failed">
-      <bpmn:incoming>Flow_0z9qo9z</bpmn:incoming>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_1h1cn6k" errorRef="Error_0q7azt4" />
-    </bpmn:endEvent>
   </bpmn:process>
   <bpmn:error id="Error_0q7azt4" name="Error_DeliveryFailed" errorCode="Error_DeliveryFailed" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -71,15 +62,6 @@
           <dc:Bounds x="359" y="83" width="42" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1crq3tv_di" bpmnElement="EndEvent_DeliveryCancelled">
-        <dc:Bounds x="432" y="302" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="415" y="345" width="70" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0y61cee_di" bpmnElement="Event_0hiq3tu">
-        <dc:Bounds x="332" y="239" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1le9c94_di" bpmnElement="Flow_1le9c94">
         <di:waypoint x="215" y="217" />
         <di:waypoint x="270" y="217" />
@@ -107,11 +89,6 @@
         <di:waypoint x="362" y="120" />
         <di:waypoint x="320" y="120" />
         <di:waypoint x="320" y="177" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0z9qo9z_di" bpmnElement="Flow_0z9qo9z">
-        <di:waypoint x="350" y="275" />
-        <di:waypoint x="350" y="320" />
-        <di:waypoint x="432" y="320" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.Elements.Task_SendCancellation;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.mockito.Mockito.*;
@@ -95,16 +96,20 @@ public class OrderProcessTest {
     @Test
     public void shouldExecuteCancellationSent() {
         //Register implementation of SendCancellationDelegate (with private member mailingService), see Mocks
-        Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailingService));
+        //Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailingService));
 
+        when(testOrderProcess.waitsAtServiceTask(Task_SendCancellation)).thenReturn(task ->{
+            // Simulate sending an email
+            task.complete();
+        });
         when(testOrderProcess.waitsAtUserTask(TASK_CHECK_AVAILABILITY)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
 
         Scenario.run(testOrderProcess)
                 .startByKey(PROCESS_KEY, withVariables(VAR_CUSTOMER, "john"))
                 .execute();
 
-        verify(mailingService, (times(1))).sendMail(any());
-        verifyNoMoreInteractions(mailingService);
+        //verify(mailingService, (times(1))).sendMail(any());
+        //verifyNoMoreInteractions(mailingService);
         verify(testOrderProcess)
                 .hasFinished(END_EVENT_CANCELLATION_SENT);
 

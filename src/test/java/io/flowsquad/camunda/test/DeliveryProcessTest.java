@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.taskService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -42,7 +43,7 @@ public class DeliveryProcessTest {
         MockitoAnnotations.initMocks(this);
 
         //Happy-Path
-        when(testDeliveryProcess.waitsAtUserTask(TASK_DELIVER_ORDER))
+        when(testDeliveryProcess.waitsAtUserTask(Task_DeliverOrder))
                 .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
     }
 
