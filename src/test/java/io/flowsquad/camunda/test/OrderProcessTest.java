@@ -4,7 +4,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.extension.mockito.CamundaMockito;
 import org.camunda.bpm.extension.mockito.ProcessExpressions;
+import org.camunda.bpm.extension.mockito.process.CallActivityMock;
 import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
 import org.camunda.bpm.scenario.delegate.TaskDelegate;
@@ -16,12 +18,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
 import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.Elements.*;
 import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.PROCESS_ID;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.camunda.bpm.extension.mockito.ProcessExpressions.*;
 import static org.mockito.Mockito.*;
 
+//@Deployment(resources = "order-process.bpmn")
 @Deployment(resources = { "order-process.bpmn", "delivery-process.bpmn" })
 @ExtendWith(ProcessEngineCoverageExtension.class)
 public class OrderProcessTest {
@@ -37,7 +41,7 @@ public class OrderProcessTest {
             // NOTE: Each model creates a PROCESS_ID which could be imported only once!
             // SUGGESTION: Could the bpmn-to-code plugin create ORDER_PROCESS_ID, DELIVERY_PROCESS_ID instead of only PROCESS_ID?
             .builder()
-            .excludeProcessDefinitionKeys(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
+            //.excludeProcessDefinitionKeys(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
             .assertClassCoverageAtLeast(0.9)
             .build();
 
@@ -54,8 +58,8 @@ public class OrderProcessTest {
     public void defaultScenario() {
         MockitoAnnotations.initMocks(this);
 
-        when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
-                .thenReturn(Scenario.use(deliveryRequest));
+//        when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
+//                .thenReturn(Scenario.use(deliveryRequest));
 
         //Happy-Path
         when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability))
@@ -66,9 +70,11 @@ public class OrderProcessTest {
 
         //when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
         //      .thenReturn(Scenario.use(deliveryRequest));
+        //when(testOrderProcess.waitsAtUserTask(Task_DeliverOrder))
+        //        .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, false)), task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
 
-        when(testOrderProcess.waitsAtUserTask(Task_DeliverOrder))
-                .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
+        //when(testOrderProcess.waitsAtUserTask(Task_DeliverOrder))
+        //        .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
     }
 
     @DisplayName("Send cancellation email")
@@ -95,7 +101,16 @@ public class OrderProcessTest {
         //Include partial process scenario
 //        registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID);
 //
+        // CallActivityMock mock = CamundaMockito.registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
+
+                //.onExecutionAddVariable("foo", "bar");
+        //mock.addToDeployment(deploymentBuilder);
+        //extension.manageDeployment(CamundaMockito.registerCallActivityMock(DeliveryprocessProcessApiV1.PROCESS_ID))
+        //                .deploy(mock);
+        //mock.deploy(extension);
+
         when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
+
                 .thenReturn(Scenario.use(deliveryRequest));
 
         Scenario.run(testOrderProcess)

@@ -17,7 +17,6 @@ import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.mockito.Mockito.*;
 
-
 @Deployment(resources = "delivery-process.bpmn")
 @ExtendWith(ProcessEngineCoverageExtension.class)
 class DeliveryProcessTest {
