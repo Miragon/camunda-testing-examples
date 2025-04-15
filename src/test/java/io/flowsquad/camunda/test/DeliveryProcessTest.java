@@ -24,6 +24,7 @@ class DeliveryProcessTest {
 
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
 
+    @SuppressWarnings("unused")
     public static ProcessEngineCoverageExtension extension = ProcessEngineCoverageExtension
             .builder()
             .assertClassCoverageAtLeast(0.9)

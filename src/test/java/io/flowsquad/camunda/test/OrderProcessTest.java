@@ -1,5 +1,7 @@
 package io.flowsquad.camunda.test;
 
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.extension.mockito.ProcessExpressions;
@@ -17,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.Elements.*;
 import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.PROCESS_ID;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
+import static org.camunda.bpm.extension.mockito.ProcessExpressions.*;
 import static org.mockito.Mockito.*;
 
 @Deployment(resources = "order-process.bpmn")
@@ -27,6 +30,9 @@ public class OrderProcessTest {
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
     public static final String VAR_CUSTOMER = "customer";
 
+    //public static ProcessEngineServices processEngineServices = mock(ProcessEngineServices.class);
+
+    @SuppressWarnings("unused")
     public static ProcessEngineCoverageExtension extension = ProcessEngineCoverageExtension
             // NOTE: Each model creates a PROCESS_ID which could be imported only once!
             // SUGGESTION: Could the bpmn-to-code plugin create ORDER_PROCESS_ID, DELIVERY_PROCESS_ID instead of only PROCESS_ID?
@@ -38,8 +44,15 @@ public class OrderProcessTest {
     @Mock
     private ProcessScenario testOrderProcess;
 
+//    @Mock
+//    private ProcessScenario deliveryRequest;
+
     @Mock
     private MailingService mailingService;
+
+//    public OrderProcessTest(ProcessScenario deliveryRequest) {
+//        this.deliveryRequest = deliveryRequest;
+//    }
 
     @BeforeEach
     public void defaultScenario() {
@@ -78,8 +91,8 @@ public class OrderProcessTest {
     @Test
     public void shouldExecuteHappyPath() {
         //Include partial process scenario
-        //ProcessExpressions.registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
-        //        ..deploy(extension);
+        //registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
+        //        .deploy(processEngineServices);
 
         Scenario.run(testOrderProcess)
                 .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
