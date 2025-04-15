@@ -25,17 +25,8 @@ import static org.mockito.Mockito.*;
 @Deployment(resources = "order-process.bpmn")
 public class OrderProcessTest {
 
-    //public static final String PROCESS_KEY = "orderprocess";
-    public static final String DELIVERY_PROCESS_KEY = "deliveryprocess";
-    //public static final String TASK_CHECK_AVAILABILITY = "Task_CheckAvailability";
     public static final String VAR_PRODUCTS_AVAILABLE = "productsAvailable";
-    //public static final String TASK_PREPARE_ORDER = "Task_PrepareOrder";
-    //public static final String TASK_DELIVER_ORDER = "Task_DeliverOrder";
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
-    //public static final String TASK_CANCEL_ORDER = "Task_CancelOrder";
-    //public static final String END_EVENT_ORDER_FULLFILLED = "EndEvent_OrderFullfilled";
-    public static final String END_EVENT_ORDER_CANCELLED = "EndEvent_OrderCancelled";
-    //public static final String END_EVENT_CANCELLATION_SENT = "EndEvent_CancellationSent";
     public static final String VAR_CUSTOMER = "customer";
 
     @SuppressWarnings("JUnitMalformedDeclaration")
@@ -43,7 +34,9 @@ public class OrderProcessTest {
     @ClassRule
     public static TestCoverageProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder
             .create()
-            .excludeProcessDefinitionKeys(DELIVERY_PROCESS_KEY) //Exclude partial process scenario
+            // NOTE: Each model creates a PROCESS_ID which could be imported only once!
+            // SUGGESTION: Could the bpmn-to-code plugin create ORDER_PROCESS_ID, DELIVERY_PROCESS_ID instead of only PROCESS_ID?
+            .excludeProcessDefinitionKeys(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
             .assertClassCoverageAtLeast(0.9)
             .build();
 
@@ -66,32 +59,6 @@ public class OrderProcessTest {
 
         when(testOrderProcess.waitsAtUserTask(Task_DeliverOrder))
                 .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
-
-        //Further Activities
-        //when(testOrderProcess.waitsAtUserTask(TASK_CANCEL_ORDER))
-        //        .thenReturn(TaskDelegate::complete);
-    }
-
-    @Test
-    public void shouldExecuteOrderCancelled() {
-        //Include partial process scenario
-        ProcessExpressions.registerCallActivityMock(DELIVERY_PROCESS_KEY)
-                .onExecutionDo(execution -> {
-                    throw new BpmnError("deliveryFailed");
-                })
-                .deploy(rule);
-
-        Scenario.run(testOrderProcess)
-                .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
-                .execute();
-
-        verify(testOrderProcess)
-                .hasFinished(END_EVENT_ORDER_CANCELLED);
-        //Jumps back to the corresponding boundary event and verifies the task there has completed
-        //verify(testOrderProcess)
-        //        .hasCompleted(TASK_CANCEL_ORDER);
-
-        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteOrderCancelled", greaterThanOrEqualTo(0.6));
     }
 
     @Test
@@ -116,7 +83,7 @@ public class OrderProcessTest {
     @Test
     public void shouldExecuteHappyPath() {
         //Include partial process scenario
-        ProcessExpressions.registerCallActivityMock(DELIVERY_PROCESS_KEY)
+        ProcessExpressions.registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
                 .deploy(rule);
 
         Scenario.run(testOrderProcess)

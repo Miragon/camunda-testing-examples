@@ -15,7 +15,6 @@ import org.mockito.MockitoAnnotations;
 import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.Elements.EndEvent_DeliveryCompleted;
 import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
 import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID;
-//import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.taskService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.mockito.Mockito.*;
@@ -23,11 +22,7 @@ import static org.mockito.Mockito.*;
 @Deployment(resources = "delivery-process.bpmn")
 public class DeliveryProcessTest {
 
-    //public static final String PROCESS_KEY = "deliveryprocess";
-    //public static final String TASK_DELIVER_ORDER = "Task_DeliverOrder";
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
-    //public static final String END_EVENT_DELIVERY_COMPLETED = "EndEvent_DeliveryCompleted";
-    //public static final String END_EVENT_DELIVERY_CANCELLED = "EndEvent_DeliveryCancelled";
 
     @SuppressWarnings("JUnitMalformedDeclaration")
     @Rule
@@ -48,20 +43,6 @@ public class DeliveryProcessTest {
         when(testDeliveryProcess.waitsAtUserTask(Task_DeliverOrder))
                 .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
     }
-
-//    @Test
-//    public void shouldExecuteOrderCancelled() {
-//        when(testDeliveryProcess.waitsAtUserTask(Task_DeliverOrder)).thenReturn(task -> taskService().handleBpmnError(task.getId(), "DeliveryCancelled"));
-//
-//        Scenario.run(testDeliveryProcess)
-//                .startByKey(PROCESS_ID)
-//                .execute();
-//
-//        verify(testDeliveryProcess)
-//                .hasFinished(END_EVENT_DELIVERY_CANCELLED);
-//
-//        rule.addTestMethodCoverageAssertionMatcher("shouldExecuteOrderCancelled", greaterThanOrEqualTo(0.4));
-//    }
 
     @Test
     public void shouldExecuteDeliverTwice() {
