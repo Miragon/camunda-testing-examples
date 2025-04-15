@@ -1,43 +1,37 @@
 package io.flowsquad.camunda.test;
 
-//import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.mock.Mocks;
-//import org.camunda.bpm.extension.mockito.ProcessExpressions;
-//import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageProcessEngineRule;
-//import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageProcessEngineRuleBuilder;
+import org.camunda.bpm.extension.mockito.ProcessExpressions;
 import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
 import org.camunda.bpm.scenario.delegate.TaskDelegate;
 import org.camunda.community.process_test_coverage.junit5.platform7.ProcessEngineCoverageExtension;
-import org.junit.Before;
-//import org.junit.ClassRule;
-//import org.junit.Rule;
-import org.junit.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.Elements.*;
 import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.PROCESS_ID;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
-//import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.mockito.Mockito.*;
 
 @Deployment(resources = "order-process.bpmn")
+@ExtendWith(ProcessEngineCoverageExtension.class)
 public class OrderProcessTest {
 
     public static final String VAR_PRODUCTS_AVAILABLE = "productsAvailable";
     public static final String VAR_ORDER_DELIVERED = "orderDelivered";
     public static final String VAR_CUSTOMER = "customer";
 
-    @RegisterExtension
     public static ProcessEngineCoverageExtension extension = ProcessEngineCoverageExtension
-            //.create()
             // NOTE: Each model creates a PROCESS_ID which could be imported only once!
             // SUGGESTION: Could the bpmn-to-code plugin create ORDER_PROCESS_ID, DELIVERY_PROCESS_ID instead of only PROCESS_ID?
-            //.excludeProcessDefinitionKeys(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
             .builder()
+            .excludeProcessDefinitionKeys(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
             .assertClassCoverageAtLeast(0.9)
             .build();
 
@@ -47,7 +41,7 @@ public class OrderProcessTest {
     @Mock
     private MailingService mailingService;
 
-    @Before
+    @BeforeEach
     public void defaultScenario() {
         MockitoAnnotations.initMocks(this);
 
@@ -62,6 +56,7 @@ public class OrderProcessTest {
                 .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
     }
 
+    @DisplayName("Send cancellation email")
     @Test
     public void shouldExecuteCancellationSent() {
         //Register implementation of SendCancellationDelegate (with private member mailingService), see Mocks
@@ -77,15 +72,14 @@ public class OrderProcessTest {
         verifyNoMoreInteractions(mailingService);
         verify(testOrderProcess)
                 .hasFinished(EndEvent_CancellationSent);
-
-        //rule.addTestMethodCoverageAssertionMatcher("shouldExecuteCancellationSent", greaterThanOrEqualTo(0.4));
     }
 
+    @DisplayName("Happy Path")
     @Test
     public void shouldExecuteHappyPath() {
         //Include partial process scenario
         //ProcessExpressions.registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
-        //        .deploy(extension);
+        //        ..deploy(extension);
 
         Scenario.run(testOrderProcess)
                 .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
@@ -93,7 +87,5 @@ public class OrderProcessTest {
 
         verify(testOrderProcess)
                 .hasFinished(EndEvent_OrderFullfilled);
-
-        //rule.addTestMethodCoverageAssertionMatcher("shouldExecuteHappyPath", greaterThanOrEqualTo(0.5));
     }
 }
