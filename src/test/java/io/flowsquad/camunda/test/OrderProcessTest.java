@@ -22,7 +22,7 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVar
 import static org.camunda.bpm.extension.mockito.ProcessExpressions.*;
 import static org.mockito.Mockito.*;
 
-@Deployment(resources = "order-process.bpmn")
+@Deployment(resources = { "order-process.bpmn", "delivery-process.bpmn" })
 @ExtendWith(ProcessEngineCoverageExtension.class)
 public class OrderProcessTest {
 
@@ -44,19 +44,18 @@ public class OrderProcessTest {
     @Mock
     private ProcessScenario testOrderProcess;
 
-//    @Mock
-//    private ProcessScenario deliveryRequest;
+    @Mock
+    private ProcessScenario deliveryRequest;
 
     @Mock
     private MailingService mailingService;
 
-//    public OrderProcessTest(ProcessScenario deliveryRequest) {
-//        this.deliveryRequest = deliveryRequest;
-//    }
-
     @BeforeEach
     public void defaultScenario() {
         MockitoAnnotations.initMocks(this);
+
+        when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
+                .thenReturn(Scenario.use(deliveryRequest));
 
         //Happy-Path
         when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability))
@@ -64,6 +63,9 @@ public class OrderProcessTest {
 
         when(testOrderProcess.waitsAtUserTask(Task_PrepareOrder))
                 .thenReturn(TaskDelegate::complete);
+
+        //when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
+        //      .thenReturn(Scenario.use(deliveryRequest));
 
         when(testOrderProcess.waitsAtUserTask(Task_DeliverOrder))
                 .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
@@ -91,13 +93,17 @@ public class OrderProcessTest {
     @Test
     public void shouldExecuteHappyPath() {
         //Include partial process scenario
-        //registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
-        //        .deploy(processEngineServices);
+//        registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID);
+//
+        when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
+                .thenReturn(Scenario.use(deliveryRequest));
 
         Scenario.run(testOrderProcess)
                 .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
                 .execute();
 
+//        verify(testOrderProcess)
+//                .hasFinished(EndEvent_CancellationSent);
         verify(testOrderProcess)
                 .hasFinished(EndEvent_OrderFullfilled);
     }
