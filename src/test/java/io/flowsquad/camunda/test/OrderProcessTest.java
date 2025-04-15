@@ -25,8 +25,8 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVar
 import static org.camunda.bpm.extension.mockito.ProcessExpressions.*;
 import static org.mockito.Mockito.*;
 
-//@Deployment(resources = "order-process.bpmn")
-@Deployment(resources = { "order-process.bpmn", "delivery-process.bpmn" })
+@Deployment(resources = "order-process.bpmn")
+//@Deployment(resources = { "order-process.bpmn", "delivery-process.bpmn" })
 @ExtendWith(ProcessEngineCoverageExtension.class)
 public class OrderProcessTest {
 
@@ -60,6 +60,8 @@ public class OrderProcessTest {
 
 //        when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
 //                .thenReturn(Scenario.use(deliveryRequest));
+
+
 
         //Happy-Path
         when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability))
@@ -109,8 +111,14 @@ public class OrderProcessTest {
         //                .deploy(mock);
         //mock.deploy(extension);
 
-        when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
+//        when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
+//                .thenReturn(Scenario.use(deliveryRequest));
 
+        ProcessExpressions.registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
+
+                .deploy(extension);
+
+        when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
                 .thenReturn(Scenario.use(deliveryRequest));
 
         Scenario.run(testOrderProcess)
