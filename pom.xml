@@ -150,7 +150,7 @@
                     <baseDir>${project.basedir}</baseDir>
                     <filePattern>src/main/resources/*.bpmn</filePattern>
                     <outputFolderPath>${project.basedir}/src/main/java</outputFolderPath>
-                    <packagePath>io.miragon.camunda.adapter.camunda</packagePath>
+                    <packagePath>io.miragon.camunda.order.adapter.camunda</packagePath>
                     <outputLanguage>JAVA</outputLanguage>
                     <processEngine>CAMUNDA_7</processEngine>
                 </configuration>

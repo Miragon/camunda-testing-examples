@@ -14,13 +14,13 @@ import java.util.Map;
 
 @Configuration
 @Slf4j
-@ExternalTaskSubscription("sendCancellation")
-public class SendCancellationWorker implements ExternalTaskHandler {
+@ExternalTaskSubscription("sendConfirmation")
+public class SendConfirmationWorker implements ExternalTaskHandler {
 
     private final SendMailUseCase sendMailUseCase;
 
     @Autowired
-    public SendCancellationWorker(SendMailUseCase sendMailUseCase) {
+    public SendConfirmationWorker(SendMailUseCase sendMailUseCase) {
         this.sendMailUseCase = sendMailUseCase;
     }
 
@@ -34,6 +34,6 @@ public class SendCancellationWorker implements ExternalTaskHandler {
         sendMailUseCase.sendMail(customer);
 
         //output
-        externalTaskService.complete(externalTask, Map.of("cancellationTimeStamp", Instant.now().getEpochSecond()));
+        externalTaskService.complete(externalTask, Map.of("confirmationTimeStamp", Instant.now().getEpochSecond()));
     }
 }

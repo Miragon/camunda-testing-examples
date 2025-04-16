@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_12i4hfh" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.33.1">
-  <bpmn:process id="orderprocess" name="Order process" isExecutable="true" camunda:historyTimeToLive="0">
+  <bpmn:process id="external-orderprocess" name="External Order process" isExecutable="true" camunda:historyTimeToLive="0">
     <bpmn:startEvent id="StartEvent_1" name="Order received">
       <bpmn:outgoing>Flow_00kgcrp</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_00kgcrp" sourceRef="StartEvent_1" targetRef="Task_CheckAvailability" />
-    <bpmn:sequenceFlow id="Flow_09nddfd" sourceRef="Task_CheckAvailability" targetRef="Gateway_12tl2hf" />
-    <bpmn:exclusiveGateway id="Gateway_12tl2hf" name="Products available?" default="Flow_0lghxms">
-      <bpmn:incoming>Flow_09nddfd</bpmn:incoming>
-      <bpmn:outgoing>Flow_05rygam</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0lghxms</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_05rygam" name="Yes" sourceRef="Gateway_12tl2hf" targetRef="Task_PrepareOrder">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${productsAvailable}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0lghxms" name="No" sourceRef="Gateway_12tl2hf" targetRef="Activity_1obdjk3" />
     <bpmn:userTask id="Task_CheckAvailability" name="Check availability">
       <bpmn:incoming>Flow_00kgcrp</bpmn:incoming>
       <bpmn:outgoing>Flow_09nddfd</bpmn:outgoing>
@@ -23,37 +13,37 @@
       <bpmn:incoming>Flow_05rygam</bpmn:incoming>
       <bpmn:outgoing>Flow_1xiisft</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:serviceTask id="Task_SendCancellation" name="Send cancellation" camunda:type="external" camunda:topic="sendCancellation">
-      <bpmn:incoming>Flow_0scpuav</bpmn:incoming>
-      <bpmn:outgoing>Flow_0plm3v0</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1xiisft" sourceRef="Task_PrepareOrder" targetRef="Task_DeliverOrder" />
+    <bpmn:sequenceFlow id="Flow_1xiisft" sourceRef="Task_PrepareOrder" targetRef="Task_SendConfirmation" />
+    <bpmn:endEvent id="EndEvent_OrderFullfilled" name="Order fullfilled">
+      <bpmn:incoming>Flow_096bzgf</bpmn:incoming>
+    </bpmn:endEvent>
     <bpmn:endEvent id="EndEvent_CancellationSent" name="Cancellation sent">
       <bpmn:incoming>Flow_0plm3v0</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0plm3v0" sourceRef="Task_SendCancellation" targetRef="EndEvent_CancellationSent" />
-    <bpmn:endEvent id="EndEvent_OrderFullfilled" name="Order fullfilled">
-      <bpmn:incoming>Flow_0geih94</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:callActivity id="Task_DeliverOrder" name="Deliver order" calledElement="deliveryprocess">
-      <bpmn:extensionElements>
-        <camunda:in variables="all" />
-        <camunda:in businessKey="#{execution.processBusinessKey}" />
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1xiisft</bpmn:incoming>
-      <bpmn:outgoing>Flow_0geih94</bpmn:outgoing>
-    </bpmn:callActivity>
-    <bpmn:sequenceFlow id="Flow_0geih94" sourceRef="Task_DeliverOrder" targetRef="EndEvent_OrderFullfilled" />
-    <bpmn:sequenceFlow id="Flow_0scpuav" sourceRef="Activity_1obdjk3" targetRef="Task_SendCancellation" />
-    <bpmn:scriptTask id="Activity_1obdjk3" name="Text berechnen" scriptFormat="groovy" camunda:resultVariable="body">
+    <bpmn:serviceTask id="Task_SendCancellation" name="Send cancellation" camunda:type="external" camunda:topic="sendCancellation">
       <bpmn:incoming>Flow_0lghxms</bpmn:incoming>
-      <bpmn:outgoing>Flow_0scpuav</bpmn:outgoing>
-      <bpmn:script>return "Hallo das ist mein Test"</bpmn:script>
-    </bpmn:scriptTask>
+      <bpmn:outgoing>Flow_0plm3v0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0plm3v0" sourceRef="Task_SendCancellation" targetRef="EndEvent_CancellationSent" />
+    <bpmn:exclusiveGateway id="Gateway_12tl2hf" name="Products available?" default="Flow_0lghxms">
+      <bpmn:incoming>Flow_09nddfd</bpmn:incoming>
+      <bpmn:outgoing>Flow_0lghxms</bpmn:outgoing>
+      <bpmn:outgoing>Flow_05rygam</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0lghxms" name="No" sourceRef="Gateway_12tl2hf" targetRef="Task_SendCancellation" />
+    <bpmn:sequenceFlow id="Flow_05rygam" name="Yes" sourceRef="Gateway_12tl2hf" targetRef="Task_PrepareOrder">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${productsAvailable}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_09nddfd" sourceRef="Task_CheckAvailability" targetRef="Gateway_12tl2hf" />
+    <bpmn:serviceTask id="Task_SendConfirmation" name="Send confirmation" camunda:type="external" camunda:topic="sendConfirmation">
+      <bpmn:incoming>Flow_1xiisft</bpmn:incoming>
+      <bpmn:outgoing>Flow_096bzgf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_096bzgf" sourceRef="Task_SendConfirmation" targetRef="EndEvent_OrderFullfilled" />
   </bpmn:process>
   <bpmn:message id="Message_0qeqyh6" name="Problem_Received" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="orderprocess">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="external-orderprocess">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1" bioc:stroke="black" bioc:fill="white">
         <dc:Bounds x="192" y="262" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -72,15 +62,6 @@
       <bpmndi:BPMNShape id="Activity_17frzko_di" bpmnElement="Task_PrepareOrder" bioc:stroke="black" bioc:fill="white">
         <dc:Bounds x="550" y="240" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1c812cq_di" bpmnElement="EndEvent_OrderFullfilled" bioc:stroke="black" bioc:fill="white">
-        <dc:Bounds x="892" y="262" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="876" y="303" width="68" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0jwf55w_di" bpmnElement="Task_DeliverOrder" bioc:stroke="black" bioc:fill="white">
-        <dc:Bounds x="720" y="240" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0slteev_di" bpmnElement="EndEvent_CancellationSent" bioc:stroke="black" bioc:fill="white">
         <dc:Bounds x="862" y="132" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -88,10 +69,16 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0rer012_di" bpmnElement="Task_SendCancellation" bioc:stroke="black" bioc:fill="white">
-        <dc:Bounds x="720" y="110" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_16urv0l_di" bpmnElement="Activity_1obdjk3">
         <dc:Bounds x="550" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1c812cq_di" bpmnElement="EndEvent_OrderFullfilled" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="862" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="846" y="303" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1bllzth" bpmnElement="Task_SendConfirmation" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="700" y="240" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_00kgcrp_di" bpmnElement="Flow_00kgcrp" bioc:stroke="black" bioc:fill="white">
@@ -114,24 +101,20 @@
         <di:waypoint x="470" y="150" />
         <di:waypoint x="550" y="150" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="478" y="199" width="15" height="14" />
+          <dc:Bounds x="502" y="123" width="15" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1xiisft_di" bpmnElement="Flow_1xiisft" bioc:stroke="black" bioc:fill="white">
         <di:waypoint x="650" y="280" />
-        <di:waypoint x="720" y="280" />
+        <di:waypoint x="700" y="280" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0plm3v0_di" bpmnElement="Flow_0plm3v0" bioc:stroke="black" bioc:fill="white">
-        <di:waypoint x="820" y="150" />
+        <di:waypoint x="650" y="150" />
         <di:waypoint x="862" y="150" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0geih94_di" bpmnElement="Flow_0geih94">
-        <di:waypoint x="820" y="280" />
-        <di:waypoint x="892" y="280" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0scpuav_di" bpmnElement="Flow_0scpuav">
-        <di:waypoint x="650" y="150" />
-        <di:waypoint x="720" y="150" />
+      <bpmndi:BPMNEdge id="Flow_096bzgf_di" bpmnElement="Flow_096bzgf">
+        <di:waypoint x="800" y="280" />
+        <di:waypoint x="862" y="280" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
