@@ -1,5 +1,6 @@
-package io.flowsquad.camunda.test;
+package io.miragon.camunda.order.adapter.camunda.delegate;
 
+import io.miragon.camunda.order.application.ports.in.SendMailUseCase;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +11,11 @@ import java.time.Instant;
 @Component
 public class SendCancellationDelegate implements JavaDelegate {
 
-    private final MailingService mailingService;
+    private final SendMailUseCase sendMailUseCase;
 
     @Autowired
-    public SendCancellationDelegate(MailingService mailingService) {
-        this.mailingService = mailingService;
+    public SendCancellationDelegate(SendMailUseCase sendMailUseCase) {
+        this.sendMailUseCase = sendMailUseCase;
     }
 
     @Override
@@ -23,7 +24,7 @@ public class SendCancellationDelegate implements JavaDelegate {
         final String customer = (String) delegateExecution.getVariable("customer");
 
         //processing
-        mailingService.sendMail(customer);
+        sendMailUseCase.sendMail(customer);
 
         //output
         delegateExecution.setVariable("cancellationTimeStamp", Instant.now().getEpochSecond());
