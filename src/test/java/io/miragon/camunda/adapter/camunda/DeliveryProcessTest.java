@@ -1,4 +1,4 @@
-package io.flowsquad.camunda.test;
+package io.miragon.camunda.adapter.camunda;
 
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.scenario.ProcessScenario;
@@ -11,9 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.Elements.EndEvent_DeliveryCompleted;
-import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
-import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID;
+import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1.Elements.EndEvent_DeliveryCompleted;
+import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
+import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1.PROCESS_ID;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.mockito.Mockito.*;
 

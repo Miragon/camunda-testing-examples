@@ -1,5 +1,8 @@
-package io.flowsquad.camunda.test;
+package io.miragon.camunda.adapter.camunda;
 
+import io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1;
+import io.miragon.camunda.order.application.ports.in.SendMailUseCase;
+import io.miragon.camunda.order.adapter.camunda.delegate.SendCancellationDelegate;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.mock.Mocks;
@@ -15,9 +18,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
-import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.Elements.*;
-import static io.flowsquad.camunda.test.OrderprocessProcessApiV1.PROCESS_ID;
+import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
+import static io.miragon.camunda.order.adapter.camunda.OrderprocessProcessApiV1.Elements.*;
+import static io.miragon.camunda.order.adapter.camunda.OrderprocessProcessApiV1.PROCESS_ID;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.mockito.Mockito.*;
 
@@ -42,7 +45,7 @@ public class OrderProcessTest {
     private ProcessScenario deliveryRequest;
 
     @Mock
-    private MailingService mailingService;
+    private SendMailUseCase mailUseCase;
 
     @BeforeEach
     public void defaultScenario() {
@@ -63,7 +66,7 @@ public class OrderProcessTest {
     @Test
     public void shouldExecuteCancellationSent() {
         //Register implementation of SendCancellationDelegate (with private member mailingService)
-        Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailingService));
+        Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailUseCase));
 
         when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
 
@@ -71,8 +74,8 @@ public class OrderProcessTest {
                 .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
                 .execute();
 
-        verify(mailingService, (times(1))).sendMail(any());
-        verifyNoMoreInteractions(mailingService);
+        verify(mailUseCase, (times(1))).sendMail(any());
+        verifyNoMoreInteractions(mailUseCase);
         verify(testOrderProcess)
                 .hasFinished(EndEvent_CancellationSent);
     }
@@ -82,7 +85,7 @@ public class OrderProcessTest {
     public void shouldExecuteHappyPath() {
         //Register call activity via the process engines repository service
         RepositoryService repositoryService = extension.getProcessEngine().getRepositoryService();
-        ProcessExpressions.registerCallActivityMock(io.flowsquad.camunda.test.DeliveryprocessProcessApiV1.PROCESS_ID)
+        ProcessExpressions.registerCallActivityMock(DeliveryprocessProcessApiV1.PROCESS_ID)
                 .deploy(repositoryService);
 
         when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
