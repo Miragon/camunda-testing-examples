@@ -13,7 +13,6 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![Unlicense License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
 
 
 <!-- PROJECT LOGO -->
@@ -27,9 +26,6 @@
 
   <p style="text-align: center">
     An awesome template to jumpstart your testing projects!
-    <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
-    <br />
     <br />
     <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
     &middot;
@@ -126,24 +122,44 @@ This project doesn't rely on any external dependencies or services.
 
 This project is meant to provide you examples how to unit test a BPMN process model.
 It will focus on giving you an idea of how to unit test BPMN process models.
-(It contains a running camunda starter application which we do not focus on.)
+(It contains a running camunda starter application, which we do not focus on.)
+
+The template shows an order process with optional deliveries:
+
+- One delivery takes place external
+- The other delivery is a partial process task
 
 ### Order structure
 
-src/main/java/io.miragon.camunda.order/adpater/
-
 src/main/java/io.miragon.camunda.order/
+
+src/main/java/io.miragon.camunda.order/adapter/
+
+src/main/java/io.miragon.camunda.order/adapter/camunda/
+
+src/main/java/io.miragon.camunda.order/adapter/mail/
+
+src/main/java/io.miragon.camunda.order/application/
+
+src/main/java/io.miragon.camunda.order/application/ports
+
+src/main/java/io.miragon.camunda.order/application/service
 
 src/main/resources/
 
+---
+
+src/test/java/io.miragon.camunda/
+
 src/test/java/io.miragon.camunda/adapter/camunda/
 
-src/test/java/io.miragon.camunda/adapter/utilities/
+src/test/java/io.miragon.camunda/utilities/
 
 src/test/resources/
 
-target/process-test-coverage/
+---
 
+target/
 
 <p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -221,29 +237,25 @@ Link: [https://github.com/dominikhorn63/camunda-testing-examples](https://github
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/Miragon/camunda-testing-examples?style=for-the-badge
 
 [contributors-url]: https://github.com/Miragon/camunda-testing-examples/graphs/contributors
 
-[forks-shield]: https://img.shields.io/github/forks?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/Miragon/camunda-testing-examples?style=for-the-badge
 
 [forks-url]: https://github.com/Miragon/camunda-testing-examples/fork
 
-[stars-shield]: https://img.shields.io/github/stars?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/Miragon/camunda-testing-examples?style=for-the-badge
 
 [stars-url]: https://github.com/Miragon/camunda-testing-examples/stargazers
 
-[issues-shield]: https://img.shields.io/github/issues?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/Miragon/camunda-testing-examples?style=for-the-badge
 
 [issues-url]: https://github.com/Miragon/camunda-testing-examples/issues
 
-[license-shield]: https://img.shields.io/github/license?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/Miragon/camunda-testing-examples?style=for-the-badge
 
 [license-url]: https://github.com/Miragon/camunda-testing-examples/tree/master/LICENSE
-
-[linkedin-shield]: https://img.shields.io/badge/LinkedIn-green?style=for-the-badge&logo=linkedin
-
-[linkedin-url]: https://www.linkedin.com/in/dominikhorn
 
 [JUnit-shield]: https://img.shields.io/badge/junit5-blue?style=for-the-badge&logo=junit5&logoColor=white
 
@@ -256,5 +268,3 @@ Link: [https://github.com/dominikhorn63/camunda-testing-examples](https://github
 [Camunda-shield-extension]: https://img.shields.io/badge/camunda-extensions-yellow?style=for-the-badge&logo=camunda&logoColor=white
 
 [Camunda-extension-url]: https://mvnrepository.com/search?q=org.camunda.bpm.extension
-
-
