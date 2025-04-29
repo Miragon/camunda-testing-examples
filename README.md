@@ -127,7 +127,7 @@ It will focus on giving you an idea of how to unit test BPMN process models.
 The template shows an order process with optional deliveries:
 
 - One delivery takes place external
-- The other delivery is a partial process task
+- The other delivery is a partial process
 
 ### Order structure
 
@@ -149,9 +149,7 @@ src/main/resources/
 
 ---
 
-src/test/java/io.miragon.camunda/
-
-src/test/java/io.miragon.camunda/adapter/camunda/
+src/test/java/io.miragon.camunda.order/
 
 src/test/java/io.miragon.camunda/utilities/
 
