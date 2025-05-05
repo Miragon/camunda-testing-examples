@@ -27,8 +27,6 @@
   <p style="text-align: center">
     An awesome template to jumpstart your testing projects!
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
-    &middot;
     <a href="https://github.com/Miragon/camunda-testing-examples/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
     <a href="https://github.com/Miragon/camunda-testing-examples/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
@@ -129,39 +127,6 @@ The template shows an order process with optional deliveries:
 - One delivery takes place external
 - The other delivery is a partial process
 
-### Order structure
-
-src/main/java/io.miragon.camunda.order/
-
-src/main/java/io.miragon.camunda.order/adapter/
-
-src/main/java/io.miragon.camunda.order/adapter/camunda/
-
-src/main/java/io.miragon.camunda.order/adapter/mail/
-
-src/main/java/io.miragon.camunda.order/application/
-
-src/main/java/io.miragon.camunda.order/application/ports
-
-src/main/java/io.miragon.camunda.order/application/service
-
-src/main/resources/
-
----
-
-src/test/java/io.miragon.camunda.order/
-
-src/test/java/io.miragon.camunda/utilities/
-
-src/test/resources/
-
----
-
-target/
-
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
-
-
 <!-- ROADMAP -->
 
 ## Roadmap
@@ -173,7 +138,6 @@ See the [open issues](https://github.com/Miragon/camunda-testing-examples/issues
 and known issues).
 
 <p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- CONTRIBUTING -->
