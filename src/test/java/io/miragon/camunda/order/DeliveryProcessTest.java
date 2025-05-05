@@ -1,4 +1,4 @@
-package io.miragon.camunda.adapter.camunda;
+package io.miragon.camunda.order;
 
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.scenario.ProcessScenario;

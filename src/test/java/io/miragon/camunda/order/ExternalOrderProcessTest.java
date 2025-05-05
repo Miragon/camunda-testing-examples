@@ -1,11 +1,10 @@
-package io.miragon.camunda.adapter.camunda;
+package io.miragon.camunda.order;
 
 import io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1;
+import io.miragon.camunda.order.adapter.camunda.worker.SendCancellationWorker;
+import io.miragon.camunda.order.adapter.camunda.worker.SendConfirmationWorker;
 import io.miragon.camunda.order.application.ports.in.SendMailUseCase;
-import io.miragon.camunda.order.adapter.camunda.delegate.SendCancellationDelegate;
-import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.extension.mockito.ProcessExpressions;
 import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
@@ -18,18 +17,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
-import static io.miragon.camunda.order.adapter.camunda.OrderprocessProcessApiV1.Elements.*;
-import static io.miragon.camunda.order.adapter.camunda.OrderprocessProcessApiV1.PROCESS_ID;
+import static io.miragon.camunda.order.adapter.camunda.ExternalOrderprocessProcessApiV1.Elements.*;
+import static io.miragon.camunda.order.adapter.camunda.ExternalOrderprocessProcessApiV1.PROCESS_ID;
+import static io.miragon.camunda.order.utlities.ExternalTaskMethods.completeExternalTask;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.repositoryService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.mockito.Mockito.*;
 
-@Deployment(resources = "order-process.bpmn")
+@Deployment(resources = "order-external-process.bpmn")
 @ExtendWith(ProcessEngineCoverageExtension.class)
-public class OrderProcessTest {
+public class ExternalOrderProcessTest {
 
     public static final String VAR_PRODUCTS_AVAILABLE = "productsAvailable";
-    public static final String VAR_ORDER_DELIVERED = "orderDelivered";
     public static final String VAR_CUSTOMER = "customer";
 
     @SuppressWarnings("unused")
@@ -57,16 +56,17 @@ public class OrderProcessTest {
 
         when(testOrderProcess.waitsAtUserTask(Task_PrepareOrder))
                 .thenReturn(TaskDelegate::complete);
-
-        when(testOrderProcess.waitsAtUserTask(Task_DeliverOrder))
-                .thenReturn(task -> task.complete(withVariables(VAR_ORDER_DELIVERED, true)));
     }
 
     @DisplayName("Send cancellation email")
     @Test
     public void shouldExecuteCancellationSent() {
         //Register implementation of SendCancellationDelegate (with private member mailingService)
-        Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailUseCase));
+        //Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailUseCase));
+        SendCancellationWorker worker = new SendCancellationWorker(mailUseCase);
+        when(testOrderProcess.waitsAtServiceTask(Task_SendCancellation)).thenReturn(task -> {
+            completeExternalTask(worker, task);
+        });
 
         when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
 
@@ -84,12 +84,13 @@ public class OrderProcessTest {
     @Test
     public void shouldExecuteHappyPath() {
         //Register call activity via the process engines repository service
-        RepositoryService repositoryService = extension.getProcessEngine().getRepositoryService();
         ProcessExpressions.registerCallActivityMock(DeliveryprocessProcessApiV1.PROCESS_ID)
-                .deploy(repositoryService);
+                .deploy(repositoryService());
 
-        when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
-                .thenReturn(Scenario.use(deliveryRequest));
+        SendConfirmationWorker worker = new SendConfirmationWorker(mailUseCase);
+        when(testOrderProcess.waitsAtServiceTask(Task_SendConfirmation)).thenReturn(task -> {
+            completeExternalTask(worker, task);
+        });
 
         Scenario.run(testOrderProcess)
                 .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
