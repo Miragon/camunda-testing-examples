@@ -10,6 +10,7 @@ import org.camunda.bpm.scenario.ProcessScenario;
 import org.camunda.bpm.scenario.Scenario;
 import org.camunda.bpm.scenario.delegate.TaskDelegate;
 import org.camunda.community.process_test_coverage.junit5.platform7.ProcessEngineCoverageExtension;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,11 +32,12 @@ public class ExternalOrderProcessTest {
     public static final String VAR_PRODUCTS_AVAILABLE = "productsAvailable";
     public static final String VAR_CUSTOMER = "customer";
 
-    @SuppressWarnings("unused")
     public static ProcessEngineCoverageExtension extension = ProcessEngineCoverageExtension
             .builder()
             .assertClassCoverageAtLeast(0.9)
             .build();
+
+    private AutoCloseable mocks;
 
     @Mock
     private ProcessScenario testOrderProcess;
@@ -48,14 +50,19 @@ public class ExternalOrderProcessTest {
 
     @BeforeEach
     public void defaultScenario() {
-        MockitoAnnotations.initMocks(this);
-
+        mocks = MockitoAnnotations.openMocks(this);
         //Happy-Path
         when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability))
                 .thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, true)));
-
         when(testOrderProcess.waitsAtUserTask(Task_PrepareOrder))
                 .thenReturn(TaskDelegate::complete);
+        //Register call activity via the process engines repository service
+        ProcessExpressions.registerCallActivityMock(DeliveryprocessProcessApiV1.PROCESS_ID)
+                .deploy(repositoryService());
+        SendConfirmationWorker worker = new SendConfirmationWorker(mailUseCase);
+        when(testOrderProcess.waitsAtServiceTask(Task_SendConfirmation)).thenReturn(task -> {
+            completeExternalTask(worker, task);
+        });
     }
 
     @DisplayName("Send cancellation email")
@@ -67,7 +74,6 @@ public class ExternalOrderProcessTest {
         when(testOrderProcess.waitsAtServiceTask(Task_SendCancellation)).thenReturn(task -> {
             completeExternalTask(worker, task);
         });
-
         when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
 
         Scenario.run(testOrderProcess)
@@ -83,20 +89,17 @@ public class ExternalOrderProcessTest {
     @DisplayName("Happy Path")
     @Test
     public void shouldExecuteHappyPath() {
-        //Register call activity via the process engines repository service
-        ProcessExpressions.registerCallActivityMock(DeliveryprocessProcessApiV1.PROCESS_ID)
-                .deploy(repositoryService());
-
-        SendConfirmationWorker worker = new SendConfirmationWorker(mailUseCase);
-        when(testOrderProcess.waitsAtServiceTask(Task_SendConfirmation)).thenReturn(task -> {
-            completeExternalTask(worker, task);
-        });
-
         Scenario.run(testOrderProcess)
                 .startByKey(PROCESS_ID, withVariables(VAR_CUSTOMER, "john"))
                 .execute();
-
         verify(testOrderProcess)
                 .hasFinished(EndEvent_OrderFullfilled);
+    }
+
+    @AfterEach
+    public void defaultScenarioCleanup() throws Exception {
+        if (mocks != null) {
+            mocks.close();
+        }
     }
 }
