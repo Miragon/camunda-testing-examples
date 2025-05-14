@@ -30,7 +30,6 @@ import static org.mockito.Mockito.*;
 public class OrderProcessTest {
 
     public static final String VAR_PRODUCTS_AVAILABLE = "productsAvailable";
-    public static final String VAR_ORDER_DELIVERED = "orderDelivered";
     public static final String VAR_CUSTOMER = "customer";
 
     public static ProcessEngineCoverageExtension extension = ProcessEngineCoverageExtension

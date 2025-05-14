@@ -43,9 +43,6 @@ public class ExternalOrderProcessTest {
     private ProcessScenario testOrderProcess;
 
     @Mock
-    private ProcessScenario deliveryRequest;
-
-    @Mock
     private SendMailUseCase mailUseCase;
 
     @BeforeEach
@@ -60,9 +57,7 @@ public class ExternalOrderProcessTest {
         ProcessExpressions.registerCallActivityMock(DeliveryprocessProcessApiV1.PROCESS_ID)
                 .deploy(repositoryService());
         SendConfirmationWorker worker = new SendConfirmationWorker(mailUseCase);
-        when(testOrderProcess.waitsAtServiceTask(Task_SendConfirmation)).thenReturn(task -> {
-            completeExternalTask(worker, task);
-        });
+        when(testOrderProcess.waitsAtServiceTask(Task_SendConfirmation)).thenReturn(task -> completeExternalTask(worker, task));
     }
 
     @DisplayName("Send cancellation email")
@@ -71,9 +66,7 @@ public class ExternalOrderProcessTest {
         //Register implementation of SendCancellationDelegate (with private member mailingService)
         //Mocks.register("sendCancellationDelegate", new SendCancellationDelegate(mailUseCase));
         SendCancellationWorker worker = new SendCancellationWorker(mailUseCase);
-        when(testOrderProcess.waitsAtServiceTask(Task_SendCancellation)).thenReturn(task -> {
-            completeExternalTask(worker, task);
-        });
+        when(testOrderProcess.waitsAtServiceTask(Task_SendCancellation)).thenReturn(task -> completeExternalTask(worker, task));
         when(testOrderProcess.waitsAtUserTask(Task_CheckAvailability)).thenReturn(task -> task.complete(withVariables(VAR_PRODUCTS_AVAILABLE, false)));
 
         Scenario.run(testOrderProcess)
