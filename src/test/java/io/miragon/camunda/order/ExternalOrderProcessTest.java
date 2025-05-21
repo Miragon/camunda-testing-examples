@@ -1,6 +1,6 @@
 package io.miragon.camunda.order;
 
-import io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1;
+import io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApi;
 import io.miragon.camunda.order.adapter.camunda.worker.SendCancellationWorker;
 import io.miragon.camunda.order.adapter.camunda.worker.SendConfirmationWorker;
 import io.miragon.camunda.order.application.ports.in.SendMailUseCase;
@@ -18,8 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static io.miragon.camunda.order.adapter.camunda.ExternalOrderprocessProcessApiV1.Elements.*;
-import static io.miragon.camunda.order.adapter.camunda.ExternalOrderprocessProcessApiV1.PROCESS_ID;
+import static io.miragon.camunda.order.adapter.camunda.ExternalOrderprocessProcessApi.Elements.*;
+import static io.miragon.camunda.order.adapter.camunda.ExternalOrderprocessProcessApi.PROCESS_ID;
 import static io.miragon.camunda.order.utlities.ExternalTaskMethods.completeExternalTask;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.repositoryService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
@@ -54,7 +54,7 @@ public class ExternalOrderProcessTest {
         when(testOrderProcess.waitsAtUserTask(Task_PrepareOrder))
                 .thenReturn(TaskDelegate::complete);
         //Register call activity via the process engines repository service
-        ProcessExpressions.registerCallActivityMock(DeliveryprocessProcessApiV1.PROCESS_ID)
+        ProcessExpressions.registerCallActivityMock(DeliveryprocessProcessApi.PROCESS_ID)
                 .deploy(repositoryService());
         SendConfirmationWorker worker = new SendConfirmationWorker(mailUseCase);
         when(testOrderProcess.waitsAtServiceTask(Task_SendConfirmation)).thenReturn(task -> completeExternalTask(worker, task));

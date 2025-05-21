@@ -12,9 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1.Elements.EndEvent_DeliveryCompleted;
-import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
-import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1.PROCESS_ID;
+import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApi.Elements.EndEvent_DeliveryCompleted;
+import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApi.Elements.Task_DeliverOrder;
+import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApi.PROCESS_ID;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.mockito.Mockito.*;
 

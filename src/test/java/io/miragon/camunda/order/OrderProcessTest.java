@@ -1,6 +1,6 @@
 package io.miragon.camunda.order;
 
-import io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1;
+import io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApi;
 import io.miragon.camunda.order.adapter.camunda.delegate.SendCancellationDelegate;
 import io.miragon.camunda.order.application.ports.in.SendMailUseCase;
 import org.camunda.bpm.engine.RepositoryService;
@@ -19,9 +19,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApiV1.Elements.Task_DeliverOrder;
-import static io.miragon.camunda.order.adapter.camunda.OrderprocessProcessApiV1.Elements.*;
-import static io.miragon.camunda.order.adapter.camunda.OrderprocessProcessApiV1.PROCESS_ID;
+import static io.miragon.camunda.order.adapter.camunda.DeliveryprocessProcessApi.Elements.Task_DeliverOrder;
+import static io.miragon.camunda.order.adapter.camunda.OrderprocessProcessApi.Elements.*;
+import static io.miragon.camunda.order.adapter.camunda.OrderprocessProcessApi.PROCESS_ID;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 import static org.mockito.Mockito.*;
 
@@ -58,7 +58,7 @@ public class OrderProcessTest {
                 .thenReturn(TaskDelegate::complete);
         //Register call activity via the process engines repository service
         RepositoryService repositoryService = extension.getProcessEngine().getRepositoryService();
-        ProcessExpressions.registerCallActivityMock(DeliveryprocessProcessApiV1.PROCESS_ID)
+        ProcessExpressions.registerCallActivityMock(DeliveryprocessProcessApi.PROCESS_ID)
                 .deploy(repositoryService);
         when(testOrderProcess.runsCallActivity(Task_DeliverOrder))
                 .thenReturn(Scenario.use(deliveryRequest));

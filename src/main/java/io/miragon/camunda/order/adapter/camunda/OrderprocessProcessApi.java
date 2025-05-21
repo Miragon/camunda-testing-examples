@@ -3,7 +3,7 @@ package io.miragon.camunda.order.adapter.camunda;
 
 import java.lang.String;
 
-public final class OrderprocessProcessApiV1 {
+public final class OrderprocessProcessApi {
   public static final String PROCESS_ID = "orderprocess";
 
   public static final class Elements {
